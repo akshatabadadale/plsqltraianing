@@ -1,0 +1,578 @@
+<<OUTER>>
+DECLARE
+  X NUMBER;
+  Y NUMBER:=10;
+  Z NUMBER;
+BEGIN
+  X:=20;
+   DECLARE
+    X NUMBER;
+    Y NUMBER;
+    BEGIN
+      X:=2;
+      Y:=1;
+      OUTER.Y:=20;
+      DBMS_OUTPUT.PUT_LINE('THE RESULT IS:'|| TO_CHAR(X+Y));
+  END;
+  Z:=X+Y;
+  DBMS_OUTPUT.PUT_LINE('THE RESULT IS:'|| TO_CHAR(z));
+END;
+======================================================================
+DECLARE
+  V_ID EMPLOYEES.EMPLOYEE_ID%TYPE;
+  V_NAME EMPLOYEES.EMPLOYEE_NAME%TYPE;
+  V_SAL EMPLOYEES.SALARY%TYPE;
+  BEGIN
+    SELECT EMPLOYEE_ID,EMPLOYEE_NAME,SALARY INTO V_ID,V_NAME,V_SAL
+    FROM EMPLOYEES
+    WHERE employee_id=7876;
+    
+    dbms_output.put_line(V_ID||'  '|| v_name||' '|| v_sal);
+END;
+======================================================
+DECLARE
+  TYPE SALTYPE IS RECORD(V_ID EMPLOYEES.EMPLOYEE_ID%TYPE,
+  V_NAME EMPLOYEES.EMPLOYEE_NAME%TYPE,
+  V_SAL EMPLOYEES.SALARY%TYPE
+  );
+  
+  V_SALREC SALTYPE;
+  BEGIN
+    SELECT EMPLOYEE_ID,EMPLOYEE_NAME,SALARY INTO V_SALREC.V_ID,V_SALREC.V_NAME,V_SALREC.V_SAL
+    FROM EMPLOYEES
+    WHERE employee_id=7876;
+    
+    dbms_output.put_line(V_SALREC.V_ID||'  '|| V_SALREC.v_name||' '||V_SALREC.v_sal);
+END;
+=======================================================
+DECLARE
+  V_EMPREC EMPLOYEES%ROWTYPE;
+  BEGIN
+    SELECT * INTO v_emprec
+    FROM EMPLOYEES
+    WHERE employee_id=7876;
+    
+    dbms_output.put_line(V_EMPREC.EMPLOYEE_ID||'  '|| V_EMPREC.EMPLOYEE_NAME||' '||V_EMPREC.SALARY);
+END;
+==========================================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+  V_SAL NUMBER(9,2);
+  BEGIN
+    SELECT AVG(SALARY) INTO V_AVGSAL 
+    FROM EMPLOYEES;
+    
+    SELECT SALARY INTO V_SAL 
+    FROM EMPLOYEES
+    WHERE employee_id=7876;
+    
+    WHILE V_SAL<V_AVGSAL
+    LOOP
+      v_sal:= v_sal*1.10;
+      IF v_sal<= v_avgsal then
+        dbms_output.put_line('Incrementibn...   '||to_char(v_sal));
+        end if;
+    END LOOP;
+END;
+==================================================
+DECLARE
+  V_name employees.employee_name% TYPE;
+  V_SAL NUMBER(9,2);
+  v_stars varchar2(50);
+  BEGIN  
+    SELECT employee_name,SALARY INTO  V_name,V_SAL
+    FROM EMPLOYEES
+    WHERE employee_id=&ID;
+    
+    v_sal:= round((v_sal*12)/1000,0);
+    WHILE V_SAL>=1
+    LOOP
+      v_stars:= v_stars||'*';
+      v_sal:= v_sal-1;
+    END LOOP;
+    dbms_output.put_line(v_name||v_stars);
+END;
+===================================================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+  V_SAL NUMBER(9,2);
+  v_EMPID NUMBER(4);
+  
+  CURSOR SALCUR IS
+  SELECT EMPLOYEE_ID,SALARY
+  FROM employees
+  WHERE department_id=30;
+  
+  BEGIN
+    SELECT AVG(SALARY) INTO V_AVGSAL 
+    FROM EMPLOYEES;
+    
+    IF NOT SALCUR%ISOPEN THEN
+      OPEN SALCUR;
+    END IF;
+    
+    LOOP
+      FETCH SALCUR INTO v_EMPID,V_SAL;
+      EXIT WHEN SALCUR%NOTFOUND;
+      dbms_output.put_line('EMPLOYEE ID: '||to_char(V_EMPID)||' SALARY:'||TO_CHAR(V_SAL)||' AVERAGE:'||TO_CHAR(V_AVGSAL));
+      WHILE V_SAL<V_AVGSAL
+      LOOP
+        v_sal:= v_sal*1.10;
+        IF v_sal<= v_avgsal then
+          dbms_output.put_line('Incrementibn...   '||to_char(v_sal));
+        end if;
+      END LOOP;
+    END LOOP;
+    CLOSE SALCUR;
+END;
+======================================================================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+    
+  CURSOR SALCUR IS
+  SELECT EMPLOYEE_ID,SALARY
+  FROM employees
+  WHERE department_id=30;
+  
+  BEGIN
+    SELECT AVG(SALARY) INTO V_AVGSAL 
+    FROM EMPLOYEES;
+           
+    FOR V_CUR IN SALCUR 
+    LOOP
+      dbms_output.put_line('EMPLOYEE ID: '||to_char(V_CUR.EMPLOYEE_ID)||' SALARY:'||TO_CHAR(V_CUR.SALARY)||' AVERAGE:'||TO_CHAR(V_AVGSAL));
+      WHILE V_CUR.SALARY<V_AVGSAL
+      LOOP
+        V_CUR.SALARY:= V_CUR.SALARY*1.10;
+        IF V_CUR.SALARY<= v_avgsal then
+          dbms_output.put_line('Incrementibn...   '||to_char(V_CUR.SALARY));
+        end if;
+      END LOOP;
+    END LOOP;
+END;
+======================================================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+  V_SAL NUMBER(9,2);
+  v_EMPID NUMBER(4);
+  
+  CURSOR SALCUR(DNO NUMBER) IS
+  SELECT EMPLOYEE_ID,SALARY
+  FROM employees
+  WHERE department_id=DNO;
+  
+  BEGIN
+    SELECT AVG(SALARY) INTO V_AVGSAL 
+    FROM EMPLOYEES;
+    
+    IF NOT SALCUR%ISOPEN THEN
+      OPEN SALCUR(10);
+    END IF;
+    
+    LOOP
+      FETCH SALCUR INTO v_EMPID,V_SAL;
+      EXIT WHEN SALCUR%NOTFOUND;
+      dbms_output.put_line('EMPLOYEE ID: '||to_char(V_EMPID)||' SALARY:'||TO_CHAR(V_SAL)||' AVERAGE:'||TO_CHAR(V_AVGSAL));
+      WHILE V_SAL<V_AVGSAL
+      LOOP
+        v_sal:= v_sal*1.10;
+        IF v_sal<= v_avgsal then
+          dbms_output.put_line('Incrementibn...   '||to_char(v_sal));
+        end if;
+      END LOOP;
+    END LOOP;
+    CLOSE SALCUR;
+  END;
+============================================================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+    
+  CURSOR SALCUR IS
+  SELECT EMPLOYEE_ID,SALARY
+  FROM employees
+  WHERE department_id=30
+  FOR UPDATE;
+  
+  BEGIN
+          
+    FOR V_CUR IN SALCUR 
+    LOOP
+      V_CUR.SALARY:=V_CUR.SALARY*1.10;
+      
+      UPDATE EMPLOYEES
+      SET SALARY=V_CUR.SALARY
+      WHERE CURRENT OF SALCUR;
+      
+    END LOOP;
+END;
+=======================================================
+DECLARE
+  V_ID EMPLOYEES.EMPLOYEE_ID%TYPE;
+  V_NAME EMPLOYEES.EMPLOYEE_NAME%TYPE;
+  V_SAL EMPLOYEES.SALARY%TYPE;
+BEGIN
+  --BEGIN
+    SELECT EMPLOYEE_ID,EMPLOYEE_NAME,SALARY INTO V_ID,V_NAME,V_SAL
+    FROM EMPLOYEES
+    WHERE employee_id=&ID;
+    dbms_output.put_line(V_ID||'  '|| v_name||' '|| v_sal);
+    EXCEPTION
+      WHEN TOO_MANY_ROWS THEN
+        dbms_output.put_line('MANY EMPLOYEES FOUND....'); 
+   --END;  
+   --EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        dbms_output.put_line('WRONG EMPLOYEE CODE. RE-ENTER....');
+      
+END;
+==============================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+  V_SAL NUMBER(9,2);
+  v_EMPID NUMBER(4);
+  
+  CURSOR SALCUR(DNO NUMBER) IS
+  SELECT EMPLOYEE_ID,SALARY
+  FROM employees
+  WHERE department_id=DNO;
+  
+  BEGIN
+    SELECT AVG(SALARY) INTO V_AVGSAL 
+    FROM EMPLOYEES;
+    
+    IF NOT SALCUR%ISOPEN THEN
+      OPEN SALCUR(11);
+    END IF;
+    V_SAL:=4/0;
+    LOOP
+      FETCH SALCUR INTO v_EMPID,V_SAL;
+      EXIT WHEN SALCUR%NOTFOUND;
+      dbms_output.put_line('EMPLOYEE ID: '||to_char(V_EMPID)||' SALARY:'||TO_CHAR(V_SAL)||' AVERAGE:'||TO_CHAR(V_AVGSAL));
+      WHILE V_SAL<V_AVGSAL
+      LOOP
+        v_sal:= v_sal*1.10;
+        IF v_sal<= v_avgsal then
+          dbms_output.put_line('Incrementibn...   '||to_char(v_sal));
+        end if;
+      END LOOP;
+    END LOOP;
+    CLOSE SALCUR;
+    EXCEPTION
+      WHEN INVALID_CURSOR THEN
+        dbms_output.put_line('PLEASE OPEN OR REFER THE CORRECT CURSOR');
+      WHEN OTHERS THEN
+        dbms_output.put_line('UN KNOWN EXCEPTION');
+  END;
+================================================================
+declare
+refexp exception;
+PRAGMA exception_init(refexp,-2292);
+begin
+delete from departments
+where department_id=30;
+exception
+when refexp then
+dbms_output.put_line('child records found...');
+end;
+================================
+DECLARE
+  V_AVGSAL NUMBER(9,2);
+  V_SAL NUMBER(9,2);
+  exp exception;
+  BEGIN
+    SELECT AVG(SALARY) INTO V_AVGSAL 
+    FROM EMPLOYEES;
+    
+    SELECT SALARY INTO V_SAL 
+    FROM EMPLOYEES
+    WHERE employee_id=7876;
+    
+    WHILE V_SAL<V_AVGSAL
+    LOOP
+      v_sal:= v_sal*1.10;
+      IF v_sal<= v_avgsal then
+        if v_sal>1500 then 
+          raise exp;
+        end if;
+        dbms_output.put_line('Incrementibn...   '||to_char(v_sal));
+        end if;
+    END LOOP;
+    exception
+    when exp then
+    dbms_output.put_line('No more increment...');
+END;
+================================================
+create or replace procedure empsal_proc
+as
+--DECLARE
+  V_ID EMPLOYEES.EMPLOYEE_ID%TYPE;
+  V_NAME EMPLOYEES.EMPLOYEE_NAME%TYPE;
+  V_SAL EMPLOYEES.SALARY%TYPE;
+  BEGIN
+    SELECT EMPLOYEE_ID,EMPLOYEE_NAME,SALARY INTO V_ID,V_NAME,V_SAL
+    FROM EMPLOYEES
+    WHERE employee_id=7876;
+    
+    dbms_output.put_line(V_ID||'  '|| v_name||' '|| v_sal);
+END empsal_proc;
+============================================================
+create or replace procedure empsal_proc(id in number)
+as
+--DECLARE
+  V_ID EMPLOYEES.EMPLOYEE_ID%TYPE;
+  V_NAME EMPLOYEES.EMPLOYEE_NAME%TYPE;
+  V_SAL EMPLOYEES.SALARY%TYPE;
+  BEGIN
+    SELECT EMPLOYEE_ID,EMPLOYEE_NAME,SALARY INTO V_ID,V_NAME,V_SAL
+    FROM EMPLOYEES
+    WHERE employee_id= id;
+    
+    dbms_output.put_line(V_ID||'  '|| v_name||' '|| v_sal);
+END empsal_proc;
+=====================================================================
+create or replace procedure empsal_procout(id in number,name out varchar2,sal out number)
+as
+BEGIN
+    SELECT EMPLOYEE_NAME,SALARY INTO name,sal
+    FROM EMPLOYEES
+    WHERE employee_id= id;
+END empsal_procout;
+/
+
+declare
+  name varchar2(20);
+  sal number(6);
+begin
+empsal_procout(7876,name,sal);
+dbms_output.put_line(name||sal);
+end;
+=================================================================
+create or replace procedure proc_inout(abc in out VARCHAR2)
+as
+begin
+  abc:=to_char(abc,'99,999');
+end;
+
+
+declare
+  abc varchar2(10):='23000';
+begin
+  proc_inout(abc);
+  dbms_output.put_line(abc);
+end;
+====================================================================
+CREATE OR REPLACE FUNCTION get_sal(p_id IN employees.employee_id%TYPE)
+RETURN NUMBER
+IS
+  v_salary employees.salary%TYPE :=0;
+BEGIN
+  SELECT salary
+  INTO v_salary
+  FROM employees
+  WHERE employee_id = p_id;
+  RETURN v_salary;
+END get_sal;
+
+
+declare
+  abc number(8,2);
+begin
+  abc:=get_sal(7876);
+  abc:=abc*1.20;
+  dbms_output.put_line(abc);
+end;
+==============================
+CREATE OR REPLACE FUNCTION tax(p_value IN NUMBER)
+RETURN NUMBER IS
+BEGIN
+RETURN (p_value * 0.08);
+END tax;
+
+
+select employee_id, salary,tax(salary)
+from employees
+==========================================
+CREATE OR REPLACE FUNCTION tax1(id IN NUMBER)
+RETURN NUMBER IS
+  v_tax number(8,2);
+BEGIN
+  select salary*.08 into v_tax
+  from employees
+  where employee_id=id;
+  
+  RETURN v_tax;
+END tax1;
+
+select employee_id,salary,tax1(employee_id)
+from employees
+============================================
+create or replace PACKAGE comm_pack
+is
+  g_comm number :=0.10;
+  procedure reset_comm(comm in number);
+end comm_pack;
+
+
+create or replace PACKAGE body comm_pack
+is
+  function validate_comm (comm in number) return boolean
+  is
+    v_maxcomm number(8,2);
+    begin
+      select max(commission) into v_maxcomm
+      from employees;
+      
+      if comm> v_maxcomm then
+        return false;
+      else
+        return true; 
+      end if;
+  end validate_comm;
+  
+  procedure reset_comm(comm in number)
+  is
+  begin
+    if validate_comm(comm) then
+    g_comm:=comm;
+    else
+        raise_application_error(-20400,'Invalid commission...');
+    end if;
+  end reset_comm;
+end comm_pack;
+
+
+begin
+  comm_pack.reset_comm(200);
+  update employees
+  set commission=comm_pack.g_comm
+  where employee_id=7876;
+end;
+=====================================================
+CREATE OR REPLACE PROCEDURE getsal (p_deptno IN  number, p_recordset OUT sys_REFCURSOR) AS 
+BEGIN 
+  OPEN p_recordset FOR
+    SELECT employee_id,salary
+    FROM   employees
+    WHERE  department_id = p_deptno;
+END getsal;
+
+
+declare
+  id number(4);
+  sal NUMBER(9,2);
+  t_recordset sys_REFCURSOR;
+  begin
+    getsal(30,t_recordset);
+    loop
+      fetch t_recordset into id,sal;
+      exit when t_recordset%notfound;
+      dbms_output.put_line(id||sal);
+    end loop;    
+end;
+==================================================
+create or replace trigger emp_ins
+before insert on employees
+begin
+  if to_char(sysdate,'DY') in ('SUN','SAT','THU') THEN
+    RAISE_APPLICATION_ERROR(-20234,'BUSINESS NOT ALLOWED....');
+  END IF;
+end emp_ins;
+
+INSERT INTO EMPLOYEES(EMPLOYEE_ID,EMPLOYEE_NAME) 
+VALUES(2,'BBBBB')
+===========================================
+
+CREATE OR REPLACE TRIGGER CHECK_SAL
+BEFORE INSERT OR UPDATE OF SALARY 
+ON EMPLOYEES
+FOR EACH ROW
+BEGIN
+  IF INSERTING THEN
+    IF :NEW.JOB<>'PRESIDENT' AND :NEW.SALARY>=6000 THEN
+      RAISE_APPLICATION_ERROR(-20001,'SALARY SHOULD NOT EXCEED 6000.');
+    END IF;
+  ELSIF UPDATING THEN
+    IF :NEW.JOB<>'PRESIDENT' AND :NEW.SALARY>=5000 THEN
+      RAISE_APPLICATION_ERROR(-20001,'SALARY SHOULD NOT EXCEED 5000.'); 
+    END IF;
+  END IF;
+END CHECK_SAL;
+
+
+UPDATE EMPLOYEES
+SET SALARY=5600
+WHERE DEPARTMENT_ID=10
+================================================
+INSERT INTO employees(employee_id, employee_name)
+VALUES(1,'AAAAA')
+
+
+BEGIN
+INSERT INTO employees(employee_id, employee_name)
+VALUES(2,'BBBB');
+END;
+
+DECLARE
+  PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+  INSERT INTO employees(employee_id, employee_name)
+  VALUES(3,'CCCC');
+
+	UPDATE....
+
+  COMMIT;
+END;
+
+ROLLBACK
+===============================================================
+create view emp_dept_compv
+as
+select e.employee_id id,e.employee_name name,e.department_id did,d.department_name dname
+from employees e,departments d
+where e.department_id= d.department_id
+
+select * from emp_dept_compv
+
+insert into emp_dept_compv
+values(100,'ssssss',50,'SALES')
+
+
+CREATE OR REPLACE TRIGGER EMPDEPT_INST 
+INSTEAD OF INSERT 
+ON emp_dept_compv
+FOR EACH ROW
+BEGIN
+  INSERT INTO EMPLOYEES(EMPLOYEE_ID,EMPLOYEE_NAME)
+  VALUES(:NEW.ID,:NEW.NAME);
+  
+  INSERT INTO DEPARTMENTS(DEPARTMENT_ID,DEPARTMENT_NAME)
+  VALUES(:NEW.DID,:NEW.DNAME);
+END EMPDEPT_INST;
+
+
+INSERT INTO emp_dept_compv
+VALUES(100,'SSSSSS',50,'SALES')
+==================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
